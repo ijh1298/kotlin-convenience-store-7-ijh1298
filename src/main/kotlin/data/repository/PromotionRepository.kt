@@ -21,11 +21,7 @@ class PromotionRepository {
 
     private fun makePromotion(string: String): Promotion? {
         val promotionDetail = string.split(',').map { it }
-        return try {
-            promotionDetail.toPromotion()
-        } catch (e: IllegalArgumentException) {
-            null
-        }
+        return promotionDetail.toPromotion()
     }
 
     private fun makePromotions(productFile: List<String>): List<Promotion> {
