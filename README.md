@@ -71,7 +71,7 @@
   - 가격
   - 재고
   - 프로모션 유형
-- enum class Promotion
+- data class Promotion
   - 이름
   - 구매 개수
   - 증정 개수
