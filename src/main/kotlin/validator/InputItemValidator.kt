@@ -1,9 +1,9 @@
 package validator
 
-import data.ConvenienceStore
+import service.ConvenienceStoreService
 
 object InputItemValidator {
-    fun validate(inputItem: String): Unit {
+    fun validate(inputItem: String) {
         val unparsedItems = inputItem.split(',').map { it }
         requireValidTypeInput(unparsedItems)
 
@@ -23,11 +23,11 @@ object InputItemValidator {
 
     private fun requireExistItem(detailedItems: List<List<String>>) {
         val detailedItemsNames = detailedItems.map { it[NAME_IDX] }
-        require(detailedItemsNames.all { it in ConvenienceStore.getItemNames() }) { InputItemErrorMessage.NOT_EXIST_ITEM.msg }
+        require(detailedItemsNames.all { it in ConvenienceStoreService.getItemNames() }) { InputItemErrorMessage.NOT_EXIST_ITEM.msg }
     }
 
     private fun requireValidStock(detailedItems: List<List<String>>) {
-        if (detailedItems.any { ConvenienceStore.getQuantity(it[NAME_IDX]) < it[QUANTITY_IDX].toInt() })
+        if (detailedItems.any { ConvenienceStoreService.getQuantity(it[NAME_IDX]) < it[QUANTITY_IDX].toInt() })
             throw IllegalArgumentException(InputItemErrorMessage.OVER_STOCK.msg)
     }
 
