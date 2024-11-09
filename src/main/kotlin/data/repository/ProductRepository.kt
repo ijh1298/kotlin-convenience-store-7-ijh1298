@@ -1,7 +1,7 @@
 package data.repository
 
 import data.model.Product
-import validator.ProductValidator
+import data.model.Product.Companion.toProduct
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -26,11 +26,5 @@ class ProductRepository {
         return productFile.mapNotNull { makeProduct(it) }
     }
 
-    companion object {
-        private fun List<String>.toProduct(): Product? {
-            if (!ProductValidator.isValid(this))
-                return null
-            return Product(this[0], this[1].toInt(), this[2].toInt(), this[3])
-        }
-    }
+
 }
