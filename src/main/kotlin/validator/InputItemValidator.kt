@@ -3,7 +3,7 @@ package validator
 import data.ConvenienceStore
 
 object InputItemValidator {
-    fun isValid(inputItem: String): Boolean {
+    fun validate(inputItem: String): Unit {
         val unparsedItems = inputItem.split(',').map { it }
         requireValidTypeInput(unparsedItems)
 
@@ -11,7 +11,6 @@ object InputItemValidator {
         requireValidInput(detailedItems)
         requireExistItem(detailedItems)
         requireValidStock(detailedItems)
-        return true
     }
 
     private fun requireValidTypeInput(unparsedItems: List<String>) {
