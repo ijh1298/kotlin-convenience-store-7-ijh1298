@@ -9,6 +9,8 @@ class ConvenienceStoreController(
     private val inputView: InputView,
     private val outputView: OutputView,
 ) {
+    private lateinit var buyItems: List<Pair<String, Int>>
+
     fun run() {
         outputView.showStock(ConvenienceStore.products)
         loopUntilValid { tryInputItem() }
@@ -17,7 +19,9 @@ class ConvenienceStoreController(
     private fun tryInputItem(): Boolean {
         try {
             val inputItem = inputView.inputItem()
-            return InputItemValidator.isValid(inputItem)
+            InputItemValidator.validate(inputItem)
+            buyItems = inputItem.toBuyItemsList()
+            return true
         } catch (e: IllegalArgumentException) {
             println(e.message)
             return false
@@ -28,5 +32,16 @@ class ConvenienceStoreController(
         while (true) {
             if (action()) break
         }
+    }
+
+    companion object {
+        private fun String.toBuyItemsList(): List<Pair<String, Int>> {
+            val unparsedItems = this.replace("[", "").replace("]", "").split(',')
+            val pairedItems = unparsedItems.map { it.split('-') }.map { it[NAME_IDX] to it[QUANTITY_IDX].toInt() }
+            return pairedItems
+        }
+
+        private const val NAME_IDX = 0
+        private const val QUANTITY_IDX = 1
     }
 }
