@@ -4,14 +4,32 @@ import data.ConvenienceStore
 
 object InputItemValidator {
     fun isValid(inputItem: String): Boolean {
-        val items = inputItem.split(',').map { it }
-        require(items.all { Regex("^\\[.+-\\d+]$").matches(it) }) { InputItemErrorMessage.INVALID_TYPE.msg }
+        val unparsedItems = inputItem.split(',').map { it }
+        requireValidTypeInput(unparsedItems)
 
-        val detailedItems: List<List<String>> = items.map { it.removePrefix("[").removeSuffix("]").split('-') }
-        require(detailedItems.all { it[1].toInt() != 0 }) { InputItemErrorMessage.WRONG_INPUT.msg}
+        val detailedItems: List<List<String>> = unparsedItems.map { it.removePrefix("[").removeSuffix("]").split('-') }
+        requireValidInput(detailedItems)
+        requireExistItem(detailedItems)
+        requireValidStock(detailedItems)
+        return true
+    }
+
+    private fun requireValidTypeInput(unparsedItems: List<String>) {
+        require(unparsedItems.all { Regex("^\\[.+-\\d+]$").matches(it) }) { InputItemErrorMessage.INVALID_TYPE.msg }
+    }
+
+    private fun requireValidInput(detailedItems: List<List<String>>) {
+        require(detailedItems.all { it[1].toInt() != 0 }) { InputItemErrorMessage.WRONG_INPUT.msg }
+    }
+
+    private fun requireExistItem(detailedItems: List<List<String>>) {
+        val detailedItemsNames = detailedItems.map { it[NAME_IDX] }
+        require(detailedItemsNames.all { it in ConvenienceStore.getItemNames() }) { InputItemErrorMessage.NOT_EXIST_ITEM.msg }
+    }
+
+    private fun requireValidStock(detailedItems: List<List<String>>) {
         if (detailedItems.any { ConvenienceStore.getQuantity(it[NAME_IDX]) < it[QUANTITY_IDX].toInt() })
             throw IllegalArgumentException(InputItemErrorMessage.OVER_STOCK.msg)
-        return true
     }
 
     private const val NAME_IDX = 0
