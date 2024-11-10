@@ -25,6 +25,4 @@ class ProductRepository {
     private fun makeProducts(productFile: List<String>): List<Product> {
         return productFile.mapNotNull { makeProduct(it) }
     }
-
-
 }

@@ -12,7 +12,7 @@ class OutputView {
     private fun productDetail(product: Product): String {
         val nameAndPrice = String.format(ITEM_FORMAT, product.name, format.format(product.price))
         val namePriceAndStock = msgAttachNum(nameAndPrice, product.quantity)
-        if (product.promotion != "null")
+        if (product.promotion != null)
             return "$namePriceAndStock ${product.promotion}"
         return namePriceAndStock
     }
