@@ -84,10 +84,6 @@ object ConvenienceStoreService {
 
     fun getPromotionByName(promotionName: String): Promotion? = promotions.find { it.name == promotionName }
 
-    private fun getPromoProduct(productName: String) = products.find { it.name == productName && it.promotion != null }
-
-    private fun getNormalProduct(productName: String) = products.find { it.name == productName && it.promotion == null }
-
     // **Validator에서 buyQuantity만큼 구매가 가능함을 이미 확인한 상태임.**
     fun separateBuyingQuantities(productName: String, buyQuantity: Int): Pair<Int, Int> {
         val stock = getPromoProduct(productName) to getNormalProduct(productName)
@@ -98,4 +94,8 @@ object ConvenienceStoreService {
         val promoQuantity = minOf(buyQuantity, stock.first!!.quantity)
         return promoQuantity to buyQuantity - promoQuantity
     }
+
+    private fun getPromoProduct(productName: String) = products.find { it.name == productName && it.promotion != null }
+
+    private fun getNormalProduct(productName: String) = products.find { it.name == productName && it.promotion == null }
 }
