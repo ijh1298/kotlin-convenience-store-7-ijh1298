@@ -1,0 +1,9 @@
+package util
+
+enum class PurchaseStatus {
+    SUCCESS,
+    SUCCESS_WITHOUT_PROMO,
+    FAILURE_NULL_PRODUCT,
+    REQUEST_EXTRA_RESPONSE,
+    REQUEST_WITHOUT_PROMO,
+}
