@@ -1,6 +1,7 @@
 package service
 
 import camp.nextstep.edu.missionutils.DateTimes
+import data.ConvenienceStore.getReceipt
 import data.ConvenienceStore.products
 import data.ConvenienceStore.promotions
 import data.ConvenienceStore.updateStock
@@ -8,11 +9,15 @@ import data.model.*
 import util.PurchaseStatus
 
 object ConvenienceStoreService {
-    fun updateStockChanges(stockChanges: List<StockChange>) {
+    // TODO 멤버십 할인 적용
+
+    fun getReceiptByBuyProcess(stockChanges: List<StockChange>): List<Receipt> {
+        val receipts = mutableListOf<Receipt>()
         stockChanges.forEach {
             updateStock(it)
+            receipts += getReceipt(it)
         }
-        // TODO 판매 개수, 증정 개수, 비용 정산 구현해야함
+        return receipts
     }
 
     fun processToGetPromoPurchaseResult(itemName: String, promoBuyQuantity: Int): PurchaseResult {
@@ -22,35 +27,47 @@ object ConvenienceStoreService {
         return getPromoPurchaseResult(promoProduct, promoBuyQuantity)
     }
 
+    fun getPromoSuccessWithoutPromotionResult(itemName: String, buyQuantity: Int): PurchaseInfo {
+        val product = getPromoProduct(itemName)!!
+        return PurchaseInfo(product, buyQuantity, 0, false)
+    }
+
     fun getPromoSuccessResult(itemName: String, buyQuantity: Int): PurchaseInfo {
+        val product = getPromoProduct(itemName)!!
         val (_, nBuy, nGet, _, _) = getPromotion(itemName)!!
         val freeQuantity = buyQuantity / (nBuy + nGet)
-        return PurchaseInfo(buyQuantity - freeQuantity, freeQuantity, false)
+        return PurchaseInfo(product, buyQuantity - freeQuantity, freeQuantity, false)
     }
 
     fun getResultByPromoProcess(
         itemName: String,
         promoQuantity: Int,
-        normalQuantity: Int,
         response: Boolean,
     ): PurchaseInfo {
+        val product = getPromoProduct(itemName)!!
         val (_, nBuy, nGet, _, _) = getPromotion(itemName)!!
         val freeQuantity = promoQuantity / (nBuy + nGet)
         val payQuantity = freeQuantity * nBuy
 
         if (response)
-            return PurchaseInfo(promoQuantity - freeQuantity, freeQuantity, false) // 구매하고, 최초 함수에서 일반 구매 로직까지 계속 진행
-        return PurchaseInfo(payQuantity, freeQuantity, true) // 프로모션 적용 품목만 구매, 최초 함수 돌아가면 중단
+            return PurchaseInfo(
+                product,
+                promoQuantity - freeQuantity,
+                freeQuantity,
+                false
+            ) // 구매하고, 최초 함수에서 일반 구매 로직까지 계속 진행
+        return PurchaseInfo(product, payQuantity, freeQuantity, true) // 프로모션 적용 품목만 구매, 최초 함수 돌아가면 중단
     }
 
     fun getResultByExtraResponse(itemName: String, buyQuantity: Int, response: Boolean): PurchaseInfo {
+        val product = getPromoProduct(itemName)!!
         val (_, nBuy, nGet, _, _) = getPromotion(itemName)!!
         val freeQuantity = buyQuantity / (nBuy + nGet)
         val payQuantity = freeQuantity * nBuy
 
         if (response)
-            return PurchaseInfo(buyQuantity - freeQuantity, freeQuantity + nGet, false)
-        return PurchaseInfo(buyQuantity - freeQuantity, freeQuantity, false)
+            return PurchaseInfo(product, buyQuantity - freeQuantity, freeQuantity + nGet, false)
+        return PurchaseInfo(product, buyQuantity - freeQuantity, freeQuantity, false)
     }
 
     private fun getPromoPurchaseResult(product: Product, promoQuantity: Int): PurchaseResult {
@@ -102,5 +119,5 @@ object ConvenienceStoreService {
 
     private fun getPromoProduct(productName: String) = products.find { it.name == productName && it.promotion != null }
 
-    private fun getNormalProduct(productName: String) = products.find { it.name == productName && it.promotion == null }
+    fun getNormalProduct(productName: String) = products.find { it.name == productName && it.promotion == null }
 }
