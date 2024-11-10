@@ -8,6 +8,6 @@ object ConvenienceStore {
     private val productRepository = ProductRepository()
     private val promotionRepository = PromotionRepository()
 
-    val products = productRepository.fetchProducts().toMutableList()
     val promotions = promotionRepository.fetchPromotions().toMutableList()
+    val products = productRepository.fetchProducts().toMutableList()
 }
