@@ -3,13 +3,18 @@ package service
 import camp.nextstep.edu.missionutils.DateTimes
 import data.ConvenienceStore.products
 import data.ConvenienceStore.promotions
-import data.model.Product
-import data.model.Promotion
-import data.model.PurchaseInfo
-import data.model.PurchaseResult
+import data.ConvenienceStore.updateStock
+import data.model.*
 import util.PurchaseStatus
 
 object ConvenienceStoreService {
+    fun updateStockChanges(stockChanges: List<StockChange>) {
+        stockChanges.forEach {
+            updateStock(it)
+        }
+        // TODO 판매 개수, 증정 개수, 비용 정산 구현해야함
+    }
+
     fun processToGetPromoPurchaseResult(itemName: String, promoBuyQuantity: Int): PurchaseResult {
         val promoProduct = getPromoProduct(itemName)
         if (promoProduct == null)
