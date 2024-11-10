@@ -11,6 +11,7 @@ object InputItemValidator {
         requireValidInput(detailedItems)
         requireExistItem(detailedItems)
         requireValidStock(detailedItems)
+        requireNotDuplicateNames(detailedItems)
     }
 
     private fun requireValidTypeInput(unparsedItems: List<String>) {
@@ -29,6 +30,11 @@ object InputItemValidator {
     private fun requireValidStock(detailedItems: List<List<String>>) {
         if (detailedItems.any { ConvenienceStoreService.getQuantity(it[NAME_IDX]) < it[QUANTITY_IDX].toInt() })
             throw IllegalArgumentException(InputItemErrorMessage.OVER_STOCK.msg)
+    }
+
+    private fun requireNotDuplicateNames(detailedItems: List<List<String>>) {
+        val itemsNames = detailedItems.map { it[0] }
+        require(itemsNames.size == itemsNames.toSet().size) { InputItemErrorMessage.DUPLICATE_NAME.msg }
     }
 
     private const val NAME_IDX = 0
