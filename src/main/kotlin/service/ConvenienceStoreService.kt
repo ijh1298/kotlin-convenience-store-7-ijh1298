@@ -63,6 +63,31 @@ object ConvenienceStoreService {
         return PurchaseInfo(product, buyQuantity - freeQuantity, freeQuantity, false)
     }
 
+    fun getItemNames(): List<String> = products.map { it.name }
+
+    fun getPromotionNames(): List<String> = promotions.map { it.name }
+
+    fun getQuantity(productName: String): Int = products.filter { it.name == productName }.sumOf { it.quantity }
+
+    fun getPromotionByName(promotionName: String): Promotion? = promotions.find { it.name == promotionName }
+
+    fun getPromotionByProductName(productName: String): Promotion? = products.find { it.name == productName && it.promotion != null }?.promotion
+
+    // **Validator에서 buyQuantity만큼 구매가 가능함을 이미 확인한 상태임.**
+    fun separateBuyingQuantities(productName: String, buyQuantity: Int): Pair<Int, Int> {
+        val stock = getPromoProduct(productName) to getNormalProduct(productName)
+
+        if (stock.first == null) return 0 to buyQuantity
+        if (stock.second == null) return buyQuantity to 0
+
+        val promoQuantity = minOf(buyQuantity, stock.first!!.quantity)
+        return promoQuantity to buyQuantity - promoQuantity
+    }
+
+    fun getNormalProduct(productName: String) = products.find { it.name == productName && it.promotion == null }
+
+    private fun getPromoProduct(productName: String) = products.find { it.name == productName && it.promotion != null }
+
     private fun getPromoPurchaseResult(product: Product, promoQuantity: Int): PurchaseResult {
         if (!product.promotion!!.isDateValid(DateTimes.now().toLocalDate())) // 프로모션 기간이 아니면 일반 구매
             return PurchaseResult(PurchaseStatus.SUCCESS_WITHOUT_PROMO, product)
@@ -90,29 +115,4 @@ object ConvenienceStoreService {
 
     private fun needPromotionProcess(buyQuantity: Int, stock: Int, nBuy: Int, nGet: Int): Boolean =
         stock == buyQuantity && buyQuantity % (nBuy + nGet) != 0 // 지급할 프로모션 재고가 없는 경우
-
-    fun getItemNames(): List<String> = products.map { it.name }
-
-    fun getPromotionNames(): List<String> = promotions.map { it.name }
-
-    fun getQuantity(productName: String): Int = products.filter { it.name == productName }.sumOf { it.quantity }
-
-    fun getPromotionByName(promotionName: String): Promotion? = promotions.find { it.name == promotionName }
-
-    fun getPromotionByProductName(productName: String): Promotion? = products.find { it.name == productName && it.promotion != null }?.promotion
-
-    // **Validator에서 buyQuantity만큼 구매가 가능함을 이미 확인한 상태임.**
-    fun separateBuyingQuantities(productName: String, buyQuantity: Int): Pair<Int, Int> {
-        val stock = getPromoProduct(productName) to getNormalProduct(productName)
-
-        if (stock.first == null) return 0 to buyQuantity
-        if (stock.second == null) return buyQuantity to 0
-
-        val promoQuantity = minOf(buyQuantity, stock.first!!.quantity)
-        return promoQuantity to buyQuantity - promoQuantity
-    }
-
-    private fun getPromoProduct(productName: String) = products.find { it.name == productName && it.promotion != null }
-
-    fun getNormalProduct(productName: String) = products.find { it.name == productName && it.promotion == null }
 }

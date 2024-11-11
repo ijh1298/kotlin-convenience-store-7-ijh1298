@@ -22,16 +22,6 @@ object ConvenienceStore {
         return createReceipt(bills, stockChange)
     }
 
-    private fun createReceipt(bills: List<Bill>, change: StockChange): Receipt {
-        val buyNum = bills.sumOf { it.buyQuantity }
-        val getNum = bills.sumOf { it.getQuantity }
-        val discount = bills.sumOf { it.price * it.getQuantity }
-        val (regularBuyAmount, promoBuyAmount) = separateRegularPromoAmount(change)
-        val price = bills.first { it.price != 0 }.price
-
-        return Receipt(change.item, buyNum, getNum, discount, price, regularBuyAmount * price, promoBuyAmount * price)
-    }
-
     fun updateStock(stockChange: StockChange) {
         val (itemName, purchaseInfos) = stockChange
         var sellAmount = purchaseInfos.sumOf { it.buyQuantity + it.getQuantity }
@@ -53,6 +43,16 @@ object ConvenienceStore {
         val getAmount = purchaseInfos.sumOf { it.getQuantity }
         val promoAmount = getAmount + getAmount * promotion.buy // 프로모 적용가로 산 개수
         return totalBuyAmount - promoAmount to promoAmount
+    }
+
+    private fun createReceipt(bills: List<Bill>, change: StockChange): Receipt {
+        val buyNum = bills.sumOf { it.buyQuantity }
+        val getNum = bills.sumOf { it.getQuantity }
+        val discount = bills.sumOf { it.price * it.getQuantity }
+        val (regularBuyAmount, promoBuyAmount) = separateRegularPromoAmount(change)
+        val price = bills.first { it.price != 0 }.price
+
+        return Receipt(change.item, buyNum, getNum, discount, price, regularBuyAmount * price, promoBuyAmount * price)
     }
 
     private fun infoToBill(info: PurchaseInfo): Bill {
