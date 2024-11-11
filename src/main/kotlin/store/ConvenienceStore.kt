@@ -33,7 +33,7 @@ object ConvenienceStore {
     }
 
     // (정가로 산 개수, 프로모 적용가로 산 개수) 구분하는 함수
-    fun separateRegularPromoAmount(stockChange: StockChange): Pair<Int, Int> {
+    private fun separateRegularPromoAmount(stockChange: StockChange): Pair<Int, Int> {
         val (itemName, purchaseInfos) = stockChange
         val promotion = products.find { it.name == itemName && it.promotion != null }?.promotion
 

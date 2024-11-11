@@ -65,8 +65,6 @@ object ConvenienceStoreService {
 
     fun getItemNames(): List<String> = products.map { it.name }
 
-    fun getPromotionNames(): List<String> = promotions.map { it.name }
-
     fun getQuantity(productName: String): Int = products.filter { it.name == productName }.sumOf { it.quantity }
 
     fun getPromotionByName(promotionName: String): Promotion? = promotions.find { it.name == promotionName }

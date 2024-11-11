@@ -163,11 +163,7 @@ class ConvenienceStoreController(
             return pairedItems
         }
 
-        private fun String.answerToBoolean(): Boolean {
-            if (this == "Y")
-                return true
-            return false
-        }
+        private fun String.answerToBoolean(): Boolean = this == "Y"
 
         private const val WRONG_INPUT_MSG = "[ERROR] 잘못된 입력입니다. 다시 입력해 주세요."
         private const val NAME_IDX = 0
