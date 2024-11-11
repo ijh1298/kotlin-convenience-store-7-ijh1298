@@ -50,12 +50,7 @@ object ConvenienceStoreService {
         val payQuantity = freeQuantity * nBuy
 
         if (response)
-            return PurchaseInfo(
-                product,
-                promoQuantity - freeQuantity,
-                freeQuantity,
-                false
-            ) // 구매하고, 최초 함수에서 일반 구매 로직까지 계속 진행
+            return PurchaseInfo(product, promoQuantity - freeQuantity, freeQuantity, false)
         return PurchaseInfo(product, payQuantity, freeQuantity, true) // 프로모션 적용 품목만 구매, 최초 함수 돌아가면 중단
     }
 
@@ -105,6 +100,8 @@ object ConvenienceStoreService {
     fun getQuantity(productName: String): Int = products.filter { it.name == productName }.sumOf { it.quantity }
 
     fun getPromotionByName(promotionName: String): Promotion? = promotions.find { it.name == promotionName }
+
+    fun getPromotionByProductName(productName: String): Promotion? = products.find { it.name == productName && it.promotion != null }?.promotion
 
     // **Validator에서 buyQuantity만큼 구매가 가능함을 이미 확인한 상태임.**
     fun separateBuyingQuantities(productName: String, buyQuantity: Int): Pair<Int, Int> {

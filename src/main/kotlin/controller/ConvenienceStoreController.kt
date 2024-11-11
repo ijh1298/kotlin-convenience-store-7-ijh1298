@@ -2,10 +2,10 @@ package controller
 
 import data.ConvenienceStore
 import data.model.PurchaseInfo
-import data.model.PurchaseResult
 import data.model.Receipt
 import data.model.StockChange
 import service.ConvenienceStoreService
+import service.ConvenienceStoreService.getPromotionByProductName
 import util.PurchaseStatus
 import validator.InputItemValidator
 import view.InputView
@@ -50,7 +50,7 @@ class ConvenienceStoreController(
 
     private fun getEachProductPurchaseInfos(itemName: String, buyQuantity: Int): List<PurchaseInfo> {
         val (promoQuantity, normalQuantity) = ConvenienceStoreService.separateBuyingQuantities(itemName, buyQuantity)
-        val promoPurchaseInfo = getEachPurchasedPromoItem(itemName, promoQuantity)
+        val promoPurchaseInfo = getEachPurchasedPromoItem(itemName, promoQuantity, normalQuantity)
         val normalPurchaseInfo = getEachPurchasedNormalItem(itemName, normalQuantity)
 
         if (promoPurchaseInfo == null && normalPurchaseInfo.product == null) return emptyList()
@@ -64,26 +64,29 @@ class ConvenienceStoreController(
         return PurchaseInfo(product, buyQuantity, 0, false)
     }
 
-    private fun getEachPurchasedPromoItem(itemName: String, buyQuantity: Int): PurchaseInfo? {
-        val promoPurchaseResult = ConvenienceStoreService.processToGetPromoPurchaseResult(itemName, buyQuantity)
+    private fun getEachPurchasedPromoItem(itemName: String, promoQuantity: Int, normalQuantity: Int): PurchaseInfo? {
+        val promoPurchaseResult = ConvenienceStoreService.processToGetPromoPurchaseResult(itemName, promoQuantity)
 
         return when (promoPurchaseResult.status) {
-            PurchaseStatus.REQUEST_EXTRA_RESPONSE -> requestExtraGet(itemName, buyQuantity)
-            PurchaseStatus.REQUEST_WITHOUT_PROMO -> requestWithoutPromo(itemName, buyQuantity)
-            PurchaseStatus.SUCCESS_WITHOUT_PROMO -> ConvenienceStoreService.getPromoSuccessWithoutPromotionResult(itemName, buyQuantity)
-            PurchaseStatus.SUCCESS -> ConvenienceStoreService.getPromoSuccessResult(itemName, buyQuantity)
+            PurchaseStatus.REQUEST_EXTRA_RESPONSE -> requestExtraGet(itemName, promoQuantity)
+            PurchaseStatus.REQUEST_WITHOUT_PROMO -> requestWithoutPromo(itemName, promoQuantity, normalQuantity)
+            PurchaseStatus.SUCCESS_WITHOUT_PROMO -> ConvenienceStoreService.getPromoSuccessWithoutPromotionResult(itemName, promoQuantity)
+            PurchaseStatus.SUCCESS -> ConvenienceStoreService.getPromoSuccessResult(itemName, promoQuantity)
             else -> null
         }
     }
 
     private fun requestExtraGet(itemName: String, buyQuantity: Int): PurchaseInfo {
-        loopUntilValid { tryInputNeedPromotion() }
+        loopUntilValid { tryInputNeedPromotion(itemName) }
         return ConvenienceStoreService.getResultByExtraResponse(itemName, buyQuantity, needPromotion)
     }
 
-    private fun requestWithoutPromo(itemName: String, buyQuantity: Int): PurchaseInfo {
-        loopUntilValid { tryInputBuyWithoutPromotion() }
-        val (promoQuantity, normalQuantity) = ConvenienceStoreService.separateBuyingQuantities(itemName, buyQuantity)
+    private fun requestWithoutPromo(itemName: String, promoQuantity: Int, normalQuantity: Int): PurchaseInfo {
+        val promo = getPromotionByProductName(itemName)
+        var buyAndGet = 0
+        if (promo != null) buyAndGet = promo.buy + promo.get
+        println("$itemName, $promo, $promoQuantity, $buyAndGet, $normalQuantity")
+        loopUntilValid { tryInputBuyWithoutPromotion(itemName, (promoQuantity % buyAndGet) + normalQuantity) }
         return ConvenienceStoreService.getResultByPromoProcess(itemName, promoQuantity, okWithoutPromo)
     }
 
@@ -99,9 +102,9 @@ class ConvenienceStoreController(
         }
     }
 
-    private fun tryInputNeedPromotion(): Boolean {
+    private fun tryInputNeedPromotion(itemName: String): Boolean {
         try {
-            val inputNeedPromotion = inputView.inputNeedPromotion()
+            val inputNeedPromotion = inputView.inputNeedPromotion(itemName)
             require(inputNeedPromotion == "Y" || inputNeedPromotion == "N") { "[ERROR] 잘못된 입력입니다. 다시 입력해 주세요." }
             needPromotion = inputNeedPromotion.answerToBoolean()
             return true
@@ -111,9 +114,9 @@ class ConvenienceStoreController(
         }
     }
 
-    private fun tryInputBuyWithoutPromotion(): Boolean {
+    private fun tryInputBuyWithoutPromotion(itemName: String, noPromoQuantity: Int): Boolean {
         try {
-            val inputBuyWithoutPromotion = inputView.inputBuyWithoutPromotion()
+            val inputBuyWithoutPromotion = inputView.inputBuyWithoutPromotion(itemName, noPromoQuantity)
             require(inputBuyWithoutPromotion == "Y" || inputBuyWithoutPromotion == "N") { "[ERROR] 잘못된 입력입니다. 다시 입력해 주세요." }
             okWithoutPromo = inputBuyWithoutPromotion.answerToBoolean()
             return true
