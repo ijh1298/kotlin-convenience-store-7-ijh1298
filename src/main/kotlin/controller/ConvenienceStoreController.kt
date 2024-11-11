@@ -1,6 +1,6 @@
 package controller
 
-import data.ConvenienceStore
+import store.ConvenienceStore
 import data.model.PurchaseInfo
 import data.model.Receipt
 import data.model.StockChange

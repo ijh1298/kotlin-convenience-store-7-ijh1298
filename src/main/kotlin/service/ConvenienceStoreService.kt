@@ -1,10 +1,10 @@
 package service
 
 import camp.nextstep.edu.missionutils.DateTimes
-import data.ConvenienceStore.getReceipt
-import data.ConvenienceStore.products
-import data.ConvenienceStore.promotions
-import data.ConvenienceStore.updateStock
+import store.ConvenienceStore.getReceipt
+import store.ConvenienceStore.products
+import store.ConvenienceStore.promotions
+import store.ConvenienceStore.updateStock
 import data.model.*
 import util.PurchaseStatus
 
