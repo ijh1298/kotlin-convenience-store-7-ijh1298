@@ -42,10 +42,11 @@ object ConvenienceStore {
         val (itemName, purchaseInfos) = stockChange
         val promotion = products.find { it.name == itemName && it.promotion != null }?.promotion
 
-        val totalBuyAmount = purchaseInfos.sumOf { it.buyQuantity }
+        val totalBuyAmount = purchaseInfos.sumOf { it.buyQuantity + it.getQuantity }
         if (promotion == null)
             return totalBuyAmount to 0
-        val promoAmount = purchaseInfos.sumOf { it.getQuantity } * promotion.get // 프로모 적용가로 산 개수
+        val getAmount = purchaseInfos.sumOf { it.getQuantity }
+        val promoAmount = getAmount + getAmount * promotion.buy // 프로모 적용가로 산 개수
         return totalBuyAmount - promoAmount to promoAmount
     }
 
