@@ -15,6 +15,7 @@ class OutputView {
         showReceiptUpper(receipts)
         showReceiptMiddle(receipts)
         showReceiptDowner(receipts)
+        println()
     }
 
     private fun showReceiptUpper(receipts: List<Receipt>) {
@@ -36,12 +37,15 @@ class OutputView {
     private fun showReceiptDowner(receipts: List<Receipt>) {
         val totalQuantity = receipts.sumOf { it.buyQuantity + it.getQuantity }
         val totalCost = receipts.sumOf { (it.buyQuantity + it.getQuantity) * it.price }
+        val regularCost = receipts.sumOf { it.regularCost }
         val totalDiscount = receipts.sumOf { it.discount }
         println(RECEIPT_DOWN_TITLE)
         println(RECEIPT_TOTAL_COST.format(totalQuantity) + format.format(totalCost))
         println(RECEIPT_DISCOUNT + format.format(totalDiscount))
         // TODO 멤버십 할인
         println(RECEIPT_COST + format.format(totalCost - totalDiscount))
+        // TODO REMOVE
+        println("할인 받을 수 있는 가격 : $regularCost")
     }
 
     private fun productDetail(product: Product): String {
