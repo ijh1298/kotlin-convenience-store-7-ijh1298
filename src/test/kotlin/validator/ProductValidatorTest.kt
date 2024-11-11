@@ -13,7 +13,7 @@ class ProductValidatorTest {
         "콜라,1000,0",
     )
     @DisplayName("products.md 입력에서 인자가 4개가 아닐 때")
-    fun `상품 가격, 재고 정수 유효성 검사`(inputFirst: String, inputSecond: String, inputThird: String) {
+    fun `product 문자열 유효성 검사`(inputFirst: String, inputSecond: String, inputThird: String) {
         val test = listOf(inputFirst, inputSecond, inputThird)
         assertThat(ProductValidator.isValid(test)).isEqualTo(false)
     }
