@@ -105,7 +105,7 @@ class ConvenienceStoreController(
     private fun tryInputNeedPromotion(itemName: String): Boolean {
         try {
             val inputNeedPromotion = inputView.inputNeedPromotion(itemName)
-            require(inputNeedPromotion == "Y" || inputNeedPromotion == "N") { "[ERROR] 잘못된 입력입니다. 다시 입력해 주세요." }
+            require(inputNeedPromotion == "Y" || inputNeedPromotion == "N") { WRONG_INPUT_MSG }
             needPromotion = inputNeedPromotion.answerToBoolean()
             return true
         } catch (e: IllegalArgumentException) {
@@ -117,7 +117,7 @@ class ConvenienceStoreController(
     private fun tryInputBuyWithoutPromotion(itemName: String, noPromoQuantity: Int): Boolean {
         try {
             val inputBuyWithoutPromotion = inputView.inputBuyWithoutPromotion(itemName, noPromoQuantity)
-            require(inputBuyWithoutPromotion == "Y" || inputBuyWithoutPromotion == "N") { "[ERROR] 잘못된 입력입니다. 다시 입력해 주세요." }
+            require(inputBuyWithoutPromotion == "Y" || inputBuyWithoutPromotion == "N") { WRONG_INPUT_MSG }
             okWithoutPromo = inputBuyWithoutPromotion.answerToBoolean()
             return true
         } catch (e: IllegalArgumentException) {
@@ -129,7 +129,7 @@ class ConvenienceStoreController(
     private fun tryInputUseMembership(): Boolean {
         try {
             val inputUseMembership = inputView.inputUseMembership()
-            require(inputUseMembership == "Y" || inputUseMembership == "N") { "[ERROR] 잘못된 입력입니다. 다시 입력해 주세요." }
+            require(inputUseMembership == "Y" || inputUseMembership == "N") { WRONG_INPUT_MSG }
             useMembership = inputUseMembership.answerToBoolean()
             return true
         } catch (e: IllegalArgumentException) {
@@ -141,7 +141,7 @@ class ConvenienceStoreController(
     private fun tryInputTryAgain(): Boolean {
         try {
             val inputTryAgain = inputView.inputTryAgain()
-            require(inputTryAgain == "Y" || inputTryAgain == "N") { "[ERROR] 잘못된 입력입니다. 다시 입력해 주세요." }
+            require(inputTryAgain == "Y" || inputTryAgain == "N") { WRONG_INPUT_MSG }
             tryAgain = inputTryAgain.answerToBoolean()
             return true
         } catch (e: IllegalArgumentException) {
@@ -169,6 +169,7 @@ class ConvenienceStoreController(
             return false
         }
 
+        private const val WRONG_INPUT_MSG = "[ERROR] 잘못된 입력입니다. 다시 입력해 주세요."
         private const val NAME_IDX = 0
         private const val QUANTITY_IDX = 1
     }
