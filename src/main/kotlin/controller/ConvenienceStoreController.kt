@@ -20,22 +20,23 @@ class ConvenienceStoreController(
     private var receipts: List<Receipt> = emptyList()
     private var needPromotion: Boolean = false
     private var okWithoutPromo: Boolean = false
+    private var useMembership: Boolean = false
     private var tryAgain: Boolean = false
 
     fun run() {
+        ConvenienceStore.init()
         do {
             outputView.showStock(ConvenienceStore.products)
             loopUntilValid { tryInputItem() }
             buyItems()
-            // TODO 멤버십 할인
-            if (receipts.isNotEmpty()) outputView.showReceipts(receipts)
+            loopUntilValid { tryInputUseMembership() }
+            if (receipts.isNotEmpty()) outputView.showReceipts(receipts, useMembership)
             loopUntilValid { tryInputTryAgain() }
         } while (tryAgain)
     }
 
     private fun buyItems() {
         toBeUpdatedStocks = getAllStockChanges()
-        println(toBeUpdatedStocks)
         receipts = ConvenienceStoreService.getReceiptByBuyProcess(toBeUpdatedStocks)
     }
 
@@ -85,7 +86,6 @@ class ConvenienceStoreController(
         val promo = getPromotionByProductName(itemName)
         var buyAndGet = 0
         if (promo != null) buyAndGet = promo.buy + promo.get
-        println("$itemName, $promo, $promoQuantity, $buyAndGet, $normalQuantity")
         loopUntilValid { tryInputBuyWithoutPromotion(itemName, (promoQuantity % buyAndGet) + normalQuantity) }
         return ConvenienceStoreService.getResultByPromoProcess(itemName, promoQuantity, okWithoutPromo)
     }
@@ -119,6 +119,18 @@ class ConvenienceStoreController(
             val inputBuyWithoutPromotion = inputView.inputBuyWithoutPromotion(itemName, noPromoQuantity)
             require(inputBuyWithoutPromotion == "Y" || inputBuyWithoutPromotion == "N") { "[ERROR] 잘못된 입력입니다. 다시 입력해 주세요." }
             okWithoutPromo = inputBuyWithoutPromotion.answerToBoolean()
+            return true
+        } catch (e: IllegalArgumentException) {
+            println(e.message)
+            return false
+        }
+    }
+
+    private fun tryInputUseMembership(): Boolean {
+        try {
+            val inputUseMembership = inputView.inputUseMembership()
+            require(inputUseMembership == "Y" || inputUseMembership == "N") { "[ERROR] 잘못된 입력입니다. 다시 입력해 주세요." }
+            useMembership = inputUseMembership.answerToBoolean()
             return true
         } catch (e: IllegalArgumentException) {
             println(e.message)
