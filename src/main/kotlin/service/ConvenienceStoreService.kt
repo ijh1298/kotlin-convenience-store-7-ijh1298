@@ -9,8 +9,6 @@ import data.model.*
 import util.PurchaseStatus
 
 object ConvenienceStoreService {
-    // TODO 멤버십 할인 적용
-
     fun getReceiptByBuyProcess(stockChanges: List<StockChange>): List<Receipt> {
         val receipts = mutableListOf<Receipt>()
         stockChanges.forEach {

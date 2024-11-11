@@ -9,11 +9,11 @@ object PromotionValidator {
 
     fun isValid(promotion: List<String>): Boolean {
         return try {
-            require(promotion.size == 5) { "[ERROR] Promotion 문자열이 유효하지 않습니다." }
-            require(promotion[1].all { it.isDigit() } && promotion[1].toInt() > 0) { "[ERROR] Promotion 구매 개수가 1 이상의 유효한 정수가 아닙니다." }
-            require(promotion[2].all { it.isDigit() } && promotion[2].toInt() > 0) { "[ERROR] Promotion 증정 개수가 1 이상의 유효한 정수가 아닙니다." }
-            require(isValidDate(promotion[3])) { "[ERROR] Promotion 시작 날짜가 유효하지 않습니다." }
-            require(isValidDate(promotion[4])) { "[ERROR] Promotion 종료 날짜가 유효하지 않습니다." }
+            require(promotion.size == 5) { PromotionErrorMessage.INVALID_STRING }
+            require(promotion[1].all { it.isDigit() } && promotion[1].toInt() > 0) { PromotionErrorMessage.INVALID_INT_BUY }
+            require(promotion[2].all { it.isDigit() } && promotion[2].toInt() > 0) { PromotionErrorMessage.INVALID_INT_GET }
+            require(isValidDate(promotion[3])) { PromotionErrorMessage.INVALID_START_DATE }
+            require(isValidDate(promotion[4])) { PromotionErrorMessage.INVALID_END_DATE }
             true
         } catch (e: IllegalArgumentException) {
             false
