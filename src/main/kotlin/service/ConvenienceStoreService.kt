@@ -71,6 +71,10 @@ object ConvenienceStoreService {
 
     fun getPromotionByProductName(productName: String): Promotion? = products.find { it.name == productName && it.promotion != null }?.promotion
 
+    fun getNormalProduct(productName: String) = products.find { it.name == productName && it.promotion == null }
+
+    fun getPromoProduct(productName: String) = products.find { it.name == productName && it.promotion != null }
+
     // **Validator에서 buyQuantity만큼 구매가 가능함을 이미 확인한 상태임.**
     fun separateBuyingQuantities(productName: String, buyQuantity: Int): Pair<Int, Int> {
         val stock = getPromoProduct(productName) to getNormalProduct(productName)
@@ -81,10 +85,6 @@ object ConvenienceStoreService {
         val promoQuantity = minOf(buyQuantity, stock.first!!.quantity)
         return promoQuantity to buyQuantity - promoQuantity
     }
-
-    fun getNormalProduct(productName: String) = products.find { it.name == productName && it.promotion == null }
-
-    private fun getPromoProduct(productName: String) = products.find { it.name == productName && it.promotion != null }
 
     private fun getPromoPurchaseResult(product: Product, promoQuantity: Int): PurchaseResult {
         if (!product.promotion!!.isDateValid(DateTimes.now().toLocalDate())) // 프로모션 기간이 아니면 일반 구매
