@@ -8,8 +8,13 @@ object ConvenienceStore {
     private val productRepository = ProductRepository()
     private val promotionRepository = PromotionRepository()
 
-    val promotions = promotionRepository.fetchPromotions().toMutableList()
-    val products = productRepository.fetchProducts().toMutableList()
+    var promotions = promotionRepository.fetchPromotions().toMutableList()
+    var products = productRepository.fetchProducts().toMutableList()
+
+    fun init() {
+        promotions = promotionRepository.fetchPromotions().toMutableList()
+        products = productRepository.fetchProducts().toMutableList()
+    }
 
     fun getReceipt(stockChange: StockChange): Receipt {
         val bills = mutableListOf<Bill>()
